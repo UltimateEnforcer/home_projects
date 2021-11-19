@@ -9,8 +9,6 @@ from selenium.webdriver.common.keys import Keys
 from datetime import datetime
 from datetime import timedelta
 import time
-import re
-import csv
 import pandas
 import random
 '''
@@ -26,9 +24,9 @@ for i,line in enumerate(dino):
     if list[i]:
         dino_list.append([re.sub("\n","",x) for x in [re.sub("\d+. ","",line),dino[i+1]]])
 
-with open("C:\\Users\\DvdMe\\Documents\\good_morning_data\\dino2.csv", "w") as file:
+with open("C:\\Users\\DvdMe\\Documents\\good_morning_data\\pankie.csv", "w") as file:
     writer=csv.writer(file)
-    writer.writerows(dino_list)
+    writer.writerows(pankie)
 
 pandas.read_csv("C:\\Users\\DvdMe\\Documents\\good_morning_data\\dino2.csv",header=None, encoding='cp1252')
 
@@ -39,10 +37,14 @@ def good_morning_data(name):
         dir="C:\\Users\\DvdMe\\Documents\\good_morning_data\\"
         if name=="anna weber":
             return(dir+"dino2.csv")
+        elif name=="kili prive":
+            return(dir+"kiliR.csv")
+        elif name=="anke":
+            return(dir+"pankie.csv")
 
 def pick_message(name):
     data=pandas.read_csv(good_morning_data(name),header=None, encoding='cp1252',na_values="")
-    number=random.randint(0,len(data))
+    number=random.randint(1,len(data))-1
     message=data.iloc[number,0]
     try:
         answer=data.iloc[number,1]
@@ -56,6 +58,9 @@ def custom_message(name):
     if name=="anna weber":
         custom_message=["Goooood morning Anna! :ma u'\ue007",
                  "I hope you sleepy slept well!"]
+    elif name=="jasper prijs":
+        custom_message=["Goede morgen Jasso! :ma u'\ue007",
+                 "Hier heb je :choco u'\ue007!"]
     else:
         custom_message=""
     return(custom_message)
@@ -64,7 +69,12 @@ def delay_time(name):
     global delays
     if name=="anna weber":
         delay=5
-        delays[name]=delay
+    elif name=="kili prive":
+        delay=60*3
+    elif name=="anke":
+        delay=60*3
+    #delay=0.1
+    delays[name]=delay
     return(delay)
 
 def nick_name(name):
@@ -160,14 +170,14 @@ def send_message(name,msg):
     time.sleep(1)
     print("sent "+msg+" to "+name)
 
-names=["anna weber"]#,"farah","kili prive","chantal de leest","freddy","anke","jasper prijs"]
+names=["anna weber","kili prive","jasper prijs","anke","freddy"]#,"farah","chantal de leest"]
 today=datetime.today().day-1
 done=False
 sent_messages=0
 browser_open=False
 while True:
     time.sleep(1)
-    if datetime.now().hour>5 and datetime.now().hour<12 and (not done or datetime.today().day!=today) and sent_messages<20:
+    if datetime.now().hour>=5 and datetime.now().hour<12 and (not done or datetime.today().day!=today) and sent_messages<20:
         if datetime.today().day!=today:
             sent_messages=0
             today=datetime.today().day
@@ -179,7 +189,7 @@ while True:
         if not all(value == False for value in answers.values()):
             for name in names:
                 if messages[name]:
-                    #go_to("Me")
+                    #go_to("Me!")
                     go_to(name)
                     if online():
                         send_message(name,"message")
@@ -190,7 +200,7 @@ while True:
                         except:
                             delays[name]=datetime.now()
                 elif not messages[name] and answers[name] and delays[name]<datetime.now():
-                    #go_to("Me")
+                    #go_to("Me!")
                     go_to(name)
                     send_message(name,"answer")
                     sent_messages=sent_messages+1
