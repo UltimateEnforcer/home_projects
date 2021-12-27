@@ -62,7 +62,10 @@ def good_morning_data(name):
 def pick_message(name):
     global anna_msg
     if name=="anna weber":
-        message=anna_msg.copy()
+        try:
+            message=anna_msg.copy()
+        except:
+            message=anna_msg
     else:
         message=[]
     try:
@@ -124,7 +127,7 @@ def nick_name(name):
     elif name=="laurens":
         return("Laurens")
     else:
-        return("stranger")
+        return(name)
 
 def complete_message(name):
     global delays
@@ -201,6 +204,8 @@ def send_message(name,msg):
     time.sleep(1)
     for message in to_send:
         if name=="anna weber":
+            browser.find_element_by_css_selector("[data-tab='9'][contenteditable='true']").send_keys(message)
+            browser.find_element_by_css_selector("[data-tab='9'][contenteditable='true']").send_keys(Keys.SHIFT,Keys.RETURN)
             browser.find_element_by_css_selector("[data-tab='9'][contenteditable='true']").send_keys(dinofy(message))
         else:
             browser.find_element_by_css_selector("[data-tab='9'][contenteditable='true']").send_keys(message)
@@ -226,7 +231,7 @@ def dinofy(string):
             dino_words.append(word)
     return(" ".join(dino_words))
 
-names=["kili prive","anna weber","freddy","chantal de leest"]#"laurens",]#,"jasper prijs","anke","freddy"]#,"farah"]
+names=["kili prive","anna weber","freddy","chantal de leest","kiran","joffrey"]#"laurens",]#,"jasper prijs","anke","freddy"]#,"farah"]
 today=datetime.today().day-1
 done=False
 sent_messages=0
@@ -234,8 +239,8 @@ browser_open=False
 previous_message="asdfasddsagdsgawrfwevcmkjgfhddegf"
 last_message="asdfasddsagdsgawrfwevcmkjgfhddegf"
 while True:
-    time.sleep(0.1)
-    if datetime.now().hour>=5 and datetime.now().hour<23 and (not done or datetime.today().day!=today) and sent_messages<50:
+    time.sleep(0.5)
+    if datetime.now().hour>=5 and datetime.now().hour<22 and (not done or datetime.today().day!=today) and sent_messages<50:
         if datetime.today().day!=today:
             sent_messages=0
             today=datetime.today().day
@@ -249,11 +254,12 @@ while True:
                 if messages[name]:
                     #go_to("Me!")
                     try:
-                        #go_to(name)
-                        pass
+                        go_to(name)
+                        #pass
                     except:
+                        time.sleep(1)
                         next
-                    if not online():
+                    if online():
                         send_message(name,"message")
                         sent_messages=sent_messages+1
                         messages[name]=False
