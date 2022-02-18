@@ -14,6 +14,8 @@ import pandas
 import random
 import jellyfish
 import re
+import math
+import pyautogui
 '''
 
 #prep jokes
@@ -38,10 +40,16 @@ pandas.read_csv("C:\\Users\\DvdMe\\Documents\\good_morning_data\\dino2.csv",head
 def message_of_the_day():
     global browser
     global anna_msg
-    browser.get("https://www.beagreatteacher.com/daily-fun-fact/page/1/")
+    if datetime.today().isoweekday()>1 and datetime.today().isoweekday()<7:
+        browser.get("https://www.beagreatteacher.com/daily-fun-fact/page/"+"1"+"/")
+    else:
+        days=(datetime.today()-datetime(2021,12,1)).days
+        days=str(days-26+math.floor(days/7)*2+days%7)
+        browser.get("https://www.beagreatteacher.com/daily-fun-fact/page/"+days+"/")
     time.sleep(10)
     web_text=browser.find_element(By.CLASS_NAME,"content").text
     anna_msg=re.findall("(Random Fact of the Day:\\n.*)\\nJournal Entry",web_text)[0].split("\n")
+    anna_msg[0]=anna_msg[0]+" "
     if len(anna_msg)<3:
         anna_msg="\n".join(anna_msg)
 
@@ -200,18 +208,18 @@ def send_message(name,msg):
         to_send=[answers[name]]
         if len(to_send)==1:
             to_send=to_send[0]
-    browser.find_element_by_css_selector("[data-tab='9'][contenteditable='true']").clear()
+    browser.find_element_by_css_selector("[data-tab='10'][contenteditable='true']").clear()
     time.sleep(1)
     for message in to_send:
         if name=="anna weber":
-            browser.find_element_by_css_selector("[data-tab='9'][contenteditable='true']").send_keys(message)
-            browser.find_element_by_css_selector("[data-tab='9'][contenteditable='true']").send_keys(Keys.SHIFT,Keys.RETURN)
-            browser.find_element_by_css_selector("[data-tab='9'][contenteditable='true']").send_keys(dinofy(message))
+            browser.find_element_by_css_selector("[data-tab='10'][contenteditable='true']").send_keys(message)
+            browser.find_element_by_css_selector("[data-tab='10'][contenteditable='true']").send_keys(Keys.SHIFT,Keys.RETURN)
+            browser.find_element_by_css_selector("[data-tab='10'][contenteditable='true']").send_keys(dinofy(message))
         else:
-            browser.find_element_by_css_selector("[data-tab='9'][contenteditable='true']").send_keys(message)
-        browser.find_element_by_css_selector("[data-tab='9'][contenteditable='true']").send_keys(Keys.SHIFT,Keys.RETURN)
+            browser.find_element_by_css_selector("[data-tab='10'][contenteditable='true']").send_keys(message)
+        browser.find_element_by_css_selector("[data-tab='10'][contenteditable='true']").send_keys(Keys.SHIFT,Keys.RETURN)
     time.sleep(1)
-    browser.find_element_by_css_selector("[data-tab='9'][contenteditable='true']").send_keys(Keys.RETURN)
+    browser.find_element_by_css_selector("[data-tab='10'][contenteditable='true']").send_keys(Keys.RETURN)
     time.sleep(1)
     print("sent "+msg+" to "+name)
 
@@ -231,7 +239,7 @@ def dinofy(string):
             dino_words.append(word)
     return(" ".join(dino_words))
 
-names=["kili prive","anna weber","freddy","chantal de leest","kiran","joffrey"]#"laurens",]#,"jasper prijs","anke","freddy"]#,"farah"]
+names=["kili prive","anna weber","chantal de leest","jensz"]#"laurens",]#,"jasper prijs","anke","freddy"]#,"farah","kiran","joffrey","freddy"]
 today=datetime.today().day-1
 done=False
 sent_messages=0
@@ -240,8 +248,9 @@ previous_message="asdfasddsagdsgawrfwevcmkjgfhddegf"
 last_message="asdfasddsagdsgawrfwevcmkjgfhddegf"
 while True:
     time.sleep(0.5)
-    if datetime.now().hour>=5 and datetime.now().hour<22 and (not done or datetime.today().day!=today) and sent_messages<50:
+    if datetime.now().hour>=5 and datetime.now().hour<21 and (not done or datetime.today().day!=today) and sent_messages<50:
         if datetime.today().day!=today:
+            count=0
             sent_messages=0
             today=datetime.today().day
             start_whatsappweb()
@@ -253,11 +262,23 @@ while True:
             for name in names:
                 if messages[name]:
                     #go_to("Me!")
+                    count=count+1
+                    if count%50==0:
+                        time.sleep(1)
+                        pyautogui.keyDown("ctrl")
+                        pyautogui.press("r")
+                        pyautogui.keyUp("ctrl")
+                        time.sleep(5)
                     try:
                         go_to(name)
                         #pass
                     except:
-                        time.sleep(1)
+                        try:
+                            browser.refresh()
+                            time.sleep(60)
+                        except:
+                            browser.quit()
+                            start_whatsappweb()
                         next
                     if online():
                         send_message(name,"message")
@@ -283,20 +304,20 @@ while True:
                     elif jellyfish.damerau_levenshtein_distance("I want to guess: ",last_message[:17])==0 and last_message!=previous_message:
                         previous_message=last_message
                         if jellyfish.damerau_levenshtein_distance(answers[name][1].lower(),last_message[17:].lower())==0:
-                            browser.find_element_by_css_selector("[data-tab='9'][contenteditable='true']").clear()
+                            browser.find_element_by_css_selector("[data-tab='10'][contenteditable='true']").clear()
                             time.sleep(0.5)
-                            browser.find_element_by_css_selector("[data-tab='9'][contenteditable='true']").send_keys("Perfect, this is the right answer!")
+                            browser.find_element_by_css_selector("[data-tab='10'][contenteditable='true']").send_keys("Perfect, this is the right answer!")
                             time.sleep(0.5)
-                            browser.find_element_by_css_selector("[data-tab='9'][contenteditable='true']").send_keys(Keys.RETURN)
+                            browser.find_element_by_css_selector("[data-tab='10'][contenteditable='true']").send_keys(Keys.RETURN)
                             send_message(name,"answer")
                             answers[name]=False
                             sent_messages=sent_messages+1
                         else:
-                            browser.find_element_by_css_selector("[data-tab='9'][contenteditable='true']").clear()
+                            browser.find_element_by_css_selector("[data-tab='10'][contenteditable='true']").clear()
                             time.sleep(0.5)
-                            browser.find_element_by_css_selector("[data-tab='9'][contenteditable='true']").send_keys("It looks like you dont have the right answer!\n(Though my spelling check is as strict as it can be)\nYou are "+str(jellyfish.damerau_levenshtein_distance(answers[name][1].lower(),last_message[17:].lower()))+" substitutions away")
+                            browser.find_element_by_css_selector("[data-tab='10'][contenteditable='true']").send_keys("It looks like you dont have the right answer!\n(Though my spelling check is as strict as it can be)\nYou are "+str(jellyfish.damerau_levenshtein_distance(answers[name][1].lower(),last_message[17:].lower()))+" substitutions away")
                             time.sleep(0.5)
-                            browser.find_element_by_css_selector("[data-tab='9'][contenteditable='true']").send_keys(Keys.RETURN)
+                            browser.find_element_by_css_selector("[data-tab='10'][contenteditable='true']").send_keys(Keys.RETURN)
                             sent_messages=sent_messages+1
                         
         else:
