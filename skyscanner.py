@@ -34,24 +34,24 @@ def startup_skyscanner(van,naar):
     
     time.sleep(3)
     #remove banner
-    pyautogui.moveTo(2540,100,1)
+    pyautogui.moveTo(2540,100,0)
     pyautogui.click()
     pyautogui.press("f5")
     time.sleep(3)
     #accept cookies
-    pyautogui.moveTo(1750,1250,1)
+    pyautogui.moveTo(1750,1250,0)
     pyautogui.click()
     time.sleep(1)
     #vliegvelden in de buurt
-    pyautogui.moveTo(750,510,1)
+    pyautogui.moveTo(750,510,0)
     pyautogui.click()
     time.sleep(1)
     #enkele reis
-    pyautogui.moveTo(900,410,1)
+    pyautogui.moveTo(900,410,0)
     pyautogui.click()
     time.sleep(1)
     #Van
-    pyautogui.moveTo(750,460,1)
+    pyautogui.moveTo(750,460,0)
     pyautogui.click()
     time.sleep(1)
     pyautogui.write(van)
@@ -59,14 +59,14 @@ def startup_skyscanner(van,naar):
     pyautogui.press("enter")
     time.sleep(1)
     #Naar
-    pyautogui.moveTo(1100,460,1)
+    pyautogui.moveTo(1100,460,0)
     pyautogui.click()
     pyautogui.write(naar)
     time.sleep(1)
     pyautogui.press("enter")
     time.sleep(1)
     #tickets zoeken
-    pyautogui.moveTo(1750,515,1)
+    pyautogui.moveTo(1750,515,0)
     pyautogui.click()
     time.sleep(3)
 
@@ -115,7 +115,7 @@ try:
 except:
     pass
 
-combinations=list(pd.read_excel(r"C:\Users\DvdMe\Documents\flights.xlsx",header=None).dropna().to_records(index=False))
+combinations=list(pd.read_excel(r"C:\Users\DvdMe\Documents\git\home_projects\flights.xlsx",header=None).dropna().to_records(index=False))
 
 for combination in combinations:
     startup_skyscanner(*combination)
