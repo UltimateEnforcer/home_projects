@@ -1,0 +1,315 @@
+#osrs smelting
+
+import win32gui, win32com.client,time,os, win32con,pyautogui,random,winsound,numpy, itertools, pytesseract, re
+from matplotlib import pyplot as plt
+
+pytesseract.pytesseract.tesseract_cmd=r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+
+##building help
+
+#find mouse coordinates
+def mouse_position():
+    foreground()
+    time.sleep(2)
+    pyautogui.position()
+    
+#make formulas for a clickery area in a rectangle
+def mouse_rectangle():
+    #get the corners
+    foreground()
+    time.sleep(5)
+    pos1=pyautogui.position()
+    print(pos1)
+    winsound.Beep(300,500)
+    time.sleep(2)
+    pos2=pyautogui.position()
+    print(pos2)
+    winsound.Beep(300,500)
+    
+    #return normal distribution criterea
+    x=[(pos1.x+pos2.x)/2,abs(pos1.x-(pos1.x+pos2.x)/2)/3,min(pos1.x,pos2.x),max(pos1.x,pos2.x)]
+    y=[(pos1.y+pos2.y)/2,abs(pos1.y-(pos1.y+pos2.y)/2)/3,min(pos1.y,pos2.y),max(pos1.y,pos2.y)]
+    print("pyautogui.moveTo(tnormal(*"+str([round(item,1) for item in x])+"),tnormal(*"+str([round(item,1) for item in y])+"),tnormal(0.5,0.5,0.1,1))")
+    
+    
+
+def tnormal(mean,sd,lower,upper):
+    x=-10
+    while x<lower or x>upper:
+        x=numpy.random.normal(mean,sd)
+    return(x)
+
+#Launch the game if needed
+
+def launch():
+    #check if window exists
+    hwnd=win32gui.FindWindow(None,"Old School RuneScape")
+    try:
+        #to prevent some orange flickering?
+        shell = win32com.client.Dispatch("WScript.Shell")
+        shell.SendKeys('%')
+        
+        win32gui.SetForegroundWindow(hwnd)
+        #if not, launch!
+    except:
+        os.popen('"C:\\OldSchool RuneScape.lnk"')
+        #wait until fully loaded
+        time.sleep(10)
+        #verify launch
+
+##put window on foreground
+
+def foreground():
+
+    #find the window
+    hwnd=win32gui.FindWindow(None,"Old School RuneScape")
+    #to prevent some orange flickering?
+    shell = win32com.client.Dispatch("WScript.Shell")
+    shell.SendKeys('%')
+    
+    win32gui.SetForegroundWindow(hwnd)
+    win32gui.ShowWindow(hwnd, win32con.SW_MAXIMIZE)
+
+def select_world():
+    pyautogui.moveTo(tnormal(*[631.5, 15.2, 586, 677]),tnormal(*[522.5, 4.5, 509, 536]),tnormal(0.5,0.5,0.1,1))    
+    foreground()
+    pyautogui.click()
+    pyautogui.moveTo(tnormal(*[679.5, 13.8, 638, 721]),tnormal(*[86.5, 2.8, 78, 95]),tnormal(0.5,0.5,0.1,1))
+    foreground()
+    pyautogui.click()
+
+def login():
+    foreground()
+    pyautogui.press("enter")
+    time.sleep(0.5)
+    pyautogui.write("dvdmerkog@gmail.com",interval=0.1)
+    foreground()
+    pyautogui.press("tab")
+    foreground()
+    pyautogui.write("tafeleend",interval=0.1)
+    foreground()
+    pyautogui.press("enter")
+    time.sleep(15)
+    pyautogui.moveTo(tnormal(*[973.5, 13.5, 933, 1014]),tnormal(*[356.0, 5.0, 341, 371]),tnormal(0.5,0.5,0.1,1))
+    foreground()
+    pyautogui.click()
+    time.sleep(1)
+    #verify login
+    
+##Monitor
+
+def select(option):
+    foreground()
+    pyautogui.move(tnormal(*[0,100/3,-50,50]),tnormal(*[8+16*option, 7/3, 1+16*option, 15+16*option]),tnormal(0.5,0.5,0.1,1))
+    foreground()
+    pyautogui.click()
+    foreground()
+
+def prep_camera(direction, angle):
+    foreground()
+    pyautogui.moveTo(tnormal(*[1758.0, 5.3, 1742, 1774]),tnormal(*[42.5, 4.8, 28, 57]),tnormal(0.5,0.5,0.1,1))
+    foreground()
+    pyautogui.click(button="right")
+    select(direction)
+    foreground()
+    pyautogui.keyDown(angle)
+    time.sleep(2)
+    pyautogui.keyUp(angle)
+    foreground()
+    #max zoom
+    pyautogui.press("f10")
+    foreground()
+    pyautogui.moveTo(tnormal(*[1861.5, 7.8, 1838, 1885]),tnormal(*[757.5, 3.2, 748, 767]),tnormal(0.5,0.5,0.1,1))    
+    foreground()
+    pyautogui.click()
+    pyautogui.moveTo(tnormal(*[1764.5, 1.5, 1760, 1769]),tnormal(*[855.0, 2.0, 849, 861]),tnormal(0.5,0.5,0.1,1))
+    foreground()
+    pyautogui.click()
+    
+def take_screenshot(resize):
+    #screenshot time
+    foreground()
+    time.sleep(1)
+    img=pyautogui.screenshot()
+    img=img.resize([round(x/resize) for x in numpy.size(img)])
+    ar=numpy.array(img)
+    #ar[match]=[255,0,0]
+    ar=ar[round(20/resize):round(-50/resize),:].copy()
+    return(ar)
+
+def match(matrix,color):
+    new_matrix=matrix[:,:,0].copy()
+    for row in range(numpy.shape(matrix)[0]):
+        for column in range(numpy.shape(matrix)[1]):
+            if numpy.array_equal(matrix[row,column],color):
+                new_matrix[row,column]=1
+            else:
+                new_matrix[row,column]=0
+    return(new_matrix)
+
+def best_match(new_matrix):
+    radius=10
+    #ok having made a matrix with 0s and 1s for the colours, lets see which points have the most in range shall we? :)
+    for pixel in numpy.transpose(numpy.where(new_matrix>0)):
+        for row in range(pixel[0]-radius,pixel[0]+radius+1):
+            for column in range(pixel[1]-radius,pixel[1]+radius+1):
+                if row in range(new_matrix.shape[0]) and column in range(new_matrix.shape[1]):
+                    if new_matrix[row,column]>0:
+                        new_matrix[pixel[0],pixel[1]]+=1
+    return(numpy.unravel_index(numpy.argmax(new_matrix),numpy.shape(new_matrix)))
+
+def find_object(color):
+    resize=2
+    array=take_screenshot(resize)
+    matches=match(array,color)
+    pixel=best_match(matches)
+    return(numpy.array(pixel)*resize)
+    
+def read(img):
+    text=pytesseract.image_to_string(img)
+    text=re.sub('\n', '', text)
+    return(text.split(" "))
+
+def check(interaction):
+    foreground()
+    time.sleep(1)
+    img=pyautogui.screenshot()
+    img=img.crop((0,25,150,40))
+    if interaction in read(img):
+        return(True)
+    else:
+        print("I found "+str(read(img))+" but I was looking for '"+interaction+"'")
+        return(False)
+    
+    
+
+def interact(obj,option,interaction):
+    foreground()
+    pyautogui.moveTo(tnormal(*[obj[1],1,obj[1]-5,obj[1]+5]),tnormal(*[obj[0],1,obj[0]-5,obj[0]+5]),tnormal(0.5,0.5,0.1,1))
+    #pyautogui.moveTo(obj[1],obj[0],abs(numpy.random.normal(1,0.3)))
+    
+    #check if we did it right :)
+    foreground()
+    if check(interaction):
+        #select(option)
+        foreground()
+        pyautogui.click()
+        return(True)
+
+def jewel(option):
+    while True:
+        #Initialization
+        col=[78, 47, 28]
+        interaction="Smelt"
+        while True:
+            obj=find_object(col)
+            if interact(obj,1,interaction):
+                break
+        time.sleep(8)
+        
+        #Smelt all items
+        pyautogui.moveTo(tnormal(*[956.0, 3.3, 946, 966]),tnormal(*[559.5, 3.5, 549, 570]),tnormal(0.5,0.5,0.1,1))
+        pyautogui.move(43,0,tnormal(0.5,0.5,0.1,1))
+        if check(option):
+            foreground()
+            pyautogui.click()
+            time.sleep(20)
+
+        
+        #go to the bank
+        while not check("Bank"):
+            pyautogui.moveTo(tnormal(*[700.5, 4.5, 687, 714]),tnormal(*[993.5, 5.2, 978, 1009]),tnormal(0.5,0.5,0.1,1))
+            foreground()
+        pyautogui.click()
+        time.sleep(9)
+        
+        #deposit items
+        pyautogui.moveTo(tnormal(*[2371.0, 2.3, 2364, 2378]),tnormal(*[1160.0, 2.7, 1152, 1168]),tnormal(0.5,0.5,0.1,1))
+        foreground()
+        pyautogui.click(button="right")
+        select(6)
+        
+        #withdraw gold
+        pyautogui.moveTo(tnormal(*[982.5, 3.5, 972, 993]),tnormal(*[319.0, 2.7, 311, 327]),tnormal(0.5,0.5,0.1,1))
+        if check("Gold"):
+            foreground()
+            pyautogui.click(button="right")
+            select(4)
+        else:
+            print("I was looking for gold in my bank, but I could not find it. I do not know whow to continue from here")
+            os.system('taskkill /im JagexLauncher.exe')
+        
+        #withdraw sapphire
+        pyautogui.moveTo(tnormal(*[1029.5, 2.8, 1021, 1038]),tnormal(*[319.5, 3.5, 309, 330]),tnormal(0.5,0.5,0.1,1))
+        if check("Sapphire"):
+            foreground()
+            pyautogui.click(button="right")
+            select(4)
+        else:
+            print("I was looking for gold in my bank, but I could not find it. I do not know whow to continue from here")
+            os.system('taskkill /im JagexLauncher.exe')
+
+def splash():
+    prep_camera(4,"down")
+    while True:
+        foreground()
+        pyautogui.press("f6")
+        #check if I can cast curse
+        img=pyautogui.screenshot()
+        ar=numpy.array(img)
+        color=ar[778,1820].copy()
+        if not numpy.array_equal(color,[169,6,237]):
+            print("Am I out of runes?")
+            os.system('taskkill /im JagexLauncher.exe')
+        
+        #select curse
+        pyautogui.moveTo(tnormal(*[1824.0, 3.0, 1815, 1833]),tnormal(*[776.5, 2.8, 768, 785]),tnormal(0.5,0.5,0.1,1))
+        foreground()
+        if check("Curse"):
+            pyautogui.click()
+        else:
+            print("Curses, I didnt find my curse")
+            os.system('taskkill /im JagexLauncher.exe')
+        pyautogui.moveTo(tnormal(*[957.5, 3.8, 946, 969]),tnormal(*[478.0, 6.0, 460, 496]),tnormal(0.5,0.5,0.1,1))
+        foreground()
+        #check before attacking the monk
+        if check("Cast"):
+            pyautogui.click()
+        else:
+            print("Curses, I didnt find my curse")
+            os.system('taskkill /im JagexLauncher.exe')
+            
+            
+
+##start script
+launch()
+foreground()
+#select world
+select_world()
+#log in
+login()
+#prep camera
+prep_camera(1,"up")
+#smelting jewelry in edgeville
+#jewel("Sapphire")
+#splash curses
+splash()
+
+
+
+'''
+for count in range(10):
+    #Find and go to the furnace
+    col=[78, 47, 28]
+    interaction="Smelt"
+    while True:
+        obj=find_object(col)
+        if interact(obj,1,interaction):
+            break
+    
+    #go to the bank
+    while not check("Bank"):
+        pyautogui.moveTo(tnormal(*[700.5, 4.5, 687, 714]),tnormal(*[993.5, 5.2, 978, 1009]),abs(numpy.random.normal(1,0.3)))
+        foreground()
+    pyautogui.click()
+'''
