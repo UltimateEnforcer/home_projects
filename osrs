@@ -100,7 +100,7 @@ def login():
 
 def select(option):
     foreground()
-    pyautogui.move(tnormal(*[0,100/3,-50,50]),tnormal(*[8+16*option, 7/3, 1+16*option, 15+16*option]),tnormal(0.5,0.5,0.1,1))
+    pyautogui.move(tnormal(*[0,100/3,-50,50]),tnormal(*[6+16*option, 7/3, 1+16*option, 15+16*option]),tnormal(0.5,0.5,0.1,1))
     foreground()
     pyautogui.click()
     foreground()
@@ -174,7 +174,8 @@ def check(interaction):
     foreground()
     time.sleep(1)
     img=pyautogui.screenshot()
-    img=img.crop((0,25,200,40))
+    img=img.crop((0,25,300,40))
+    #print(img)
     if interaction in read(img):
         return(True)
     else:
@@ -196,6 +197,36 @@ def interact(obj,option,interaction):
         pyautogui.click()
         return(True)
 
+def alch(seconds,number,item):
+    start=time.time()
+    #Did we alch an item?
+    flag=False
+    
+    #do this while there is still time or there are still items
+    while time.time()-start<seconds or number>0:
+        foreground()
+        pyautogui.press("f6")
+        pyautogui.moveTo(tnormal(*[1876.0, 3.0, 1867, 1885]),tnormal(*[851.0, 2.7, 843, 859]),tnormal(0.5,0.5,0.2,1))
+        #if check("High"):
+        if True:
+            pyautogui.click()
+            pyautogui.moveTo(tnormal(*[1862.0, 4.0, 1850, 1874]),tnormal(*[979.5, 3.5, 969, 990]),tnormal(0.5,0.5,0.1,1))
+            if check(item):
+                pyautogui.click()
+                flag=True
+                number-=1
+            else:
+                pyautogui.moveTo(tnormal(*[1799.0, 2.7, 1791, 1807]),tnormal(*[722.0, 3.3, 712, 732]),tnormal(0.5,0.5,0.1,1))
+                if check("Cast") or check("Use"):
+                    foreground()
+                    pyautogui.click()
+                try:
+                    time.sleep(start+seconds-time.time())
+                    break
+                except:
+                    break
+    return(flag)
+
 def jewel(option):
     while True:
         #Initialization
@@ -205,11 +236,18 @@ def jewel(option):
             obj=find_object(col)
             if interact(obj,1,interaction):
                 break
-        time.sleep(8)
-        
+        #if we alched an item
+        if alch(9,6,"ring"):
+            #select furnace
+            pyautogui.moveTo(tnormal(*[1003.0, 2.7, 995, 1011]),tnormal(*[521.0, 3.7, 510, 532]),tnormal(0.5,0.5,0.1,1))
+            if check("Smelt"):
+                foreground()
+                pyautogui.click()
         #Smelt all items
-        pyautogui.moveTo(tnormal(*[956.0, 3.3, 946, 966]),tnormal(*[559.5, 3.5, 549, 570]),tnormal(0.5,0.5,0.1,1))
-        pyautogui.move(43,0,tnormal(0.5,0.5,0.1,1))
+        pyautogui.moveTo(tnormal(*[686.0, 5.0, 671, 701]),tnormal(*[379.5, 4.8, 365, 394]),tnormal(0.5,0.5,0.1,1))
+        #smelt spot
+        spot=1
+        pyautogui.move((625-671)*(spot-1),0,tnormal(0.5,0.5,0.1,1))
         if check(option):
             foreground()
             pyautogui.click()
@@ -218,19 +256,37 @@ def jewel(option):
         
         #go to the bank
         while not check("Bank"):
-            pyautogui.moveTo(tnormal(*[700.5, 4.5, 687, 714]),tnormal(*[993.5, 5.2, 978, 1009]),tnormal(0.5,0.5,0.1,1))
+            pyautogui.moveTo(tnormal(*[547.0, 7.7, 524, 570]),tnormal(*[735.5, 3.2, 726, 745]),tnormal(0.5,0.5,0.1,1))
             foreground()
         pyautogui.click()
-        time.sleep(9)
+        #if we alched an item
+        if alch(9,6,"ring"):
+            #select bank
+            pyautogui.moveTo(tnormal(*[964.0, 4.7, 950, 978]),tnormal(*[563.0, 5.3, 547, 579]),tnormal(0.5,0.5,0.1,1))
+            if check("Bank"):
+                foreground()
+                pyautogui.click()
+            else:
+                print("Couldnt find the bank")
+                math.sqrt(-1)
         
         #deposit items
-        pyautogui.moveTo(tnormal(*[2371.0, 2.3, 2364, 2378]),tnormal(*[1160.0, 2.7, 1152, 1168]),tnormal(0.5,0.5,0.1,1))
+        pyautogui.moveTo(tnormal(*[1862.0, 5.3, 1846, 1878]),tnormal(*[763.5, 4.2, 751, 776]),tnormal(0.5,0.5,0.2,1))
         foreground()
         pyautogui.click(button="right")
         select(6)
         
+        #Make sure items are unnoted
+        pyautogui.moveTo(tnormal(*[719.0, 6.7, 699, 739]),tnormal(*[831.0, 2.0, 825, 837]),tnormal(0.5,0.5,0.1,1))
+        if check("Item"):
+            foreground()
+            pyautogui.click()
+        else:
+            print("I was trying to unnote, but the option failed")
+            math.sqrt(-1)
+        
         #withdraw gold
-        pyautogui.moveTo(tnormal(*[982.5, 3.5, 972, 993]),tnormal(*[319.0, 2.7, 311, 327]),tnormal(0.5,0.5,0.1,1))
+        pyautogui.moveTo(tnormal(*[663.0, 5.0, 648, 678]),tnormal(*[141.5, 4.2, 129, 154]),tnormal(0.5,0.5,0.1,1))
         if check("Gold"):
             foreground()
             pyautogui.click(button="right")
@@ -240,7 +296,7 @@ def jewel(option):
             math.sqrt(-1)
         
         #withdraw sapphire
-        pyautogui.moveTo(tnormal(*[1029.5, 2.8, 1021, 1038]),tnormal(*[319.5, 3.5, 309, 330]),tnormal(0.5,0.5,0.1,1))
+        pyautogui.moveTo(tnormal(*[713.5, 5.5, 697, 730]),tnormal(*[141.0, 4.3, 128, 154]),tnormal(0.5,0.5,0.1,1))
         if check("Sapphire"):
             foreground()
             pyautogui.click(button="right")
@@ -248,6 +304,24 @@ def jewel(option):
         else:
             print("I was looking for gold in my bank, but I could not find it. I do not know whow to continue from here")
             math.sqrt(-1)
+            
+        #withdraw noted items
+        pyautogui.moveTo(tnormal(*[770.0, 7.0, 749, 791]),tnormal(*[833.0, 2.7, 825, 841]),tnormal(0.5,0.5,0.1,1))
+        if check("Note"):
+            foreground()
+            pyautogui.click()
+        else:
+            print("I was trying to note, but the option failed")
+            math.sqrt(-1)
+        
+        pyautogui.moveTo(tnormal(*[760.0, 4.0, 748, 772]),tnormal(*[141.5, 4.2, 129, 154]),tnormal(0.5,0.5,0.1,1))
+        if check("ring"):
+            foreground()
+            pyautogui.click(button="right")
+            select(4)
+        else:
+            print("I was looking for rings in my bank, but I could not find it. I do not know whow to continue from here")
+            #math.sqrt(-1)
 
 def splash():
     prep_camera(4,"down")
@@ -278,7 +352,8 @@ def splash():
         if check("Monk"):
             pyautogui.click()
         else:
-            pass            
+            pass          
+            
             
 
 ##start script
@@ -291,9 +366,9 @@ login()
 #prep camera
 prep_camera(1,"up")
 #smelting jewelry in edgeville
-#jewel("Sapphire")
+jewel("Sapphire")
 #splash curses
-splash()
+#splash()
 
 
 
