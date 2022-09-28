@@ -1,6 +1,6 @@
 #osrs smelting
 
-import win32gui, win32com.client,time,os, win32con,pyautogui,random,winsound,numpy, itertools, pytesseract, re
+import win32gui, win32com.client,time,os, win32con,pyautogui,random,winsound,numpy, itertools, pytesseract, re, math
 from matplotlib import pyplot as plt
 
 pytesseract.pytesseract.tesseract_cmd=r"C:\Program Files\Tesseract-OCR\tesseract.exe"
@@ -54,7 +54,7 @@ def launch():
     except:
         os.popen('"C:\\OldSchool RuneScape.lnk"')
         #wait until fully loaded
-        time.sleep(10)
+        time.sleep(20)
         #verify launch
 
 ##put window on foreground
@@ -89,7 +89,7 @@ def login():
     pyautogui.write("tafeleend",interval=0.1)
     foreground()
     pyautogui.press("enter")
-    time.sleep(15)
+    time.sleep(20)
     pyautogui.moveTo(tnormal(*[973.5, 13.5, 933, 1014]),tnormal(*[356.0, 5.0, 341, 371]),tnormal(0.5,0.5,0.1,1))
     foreground()
     pyautogui.click()
@@ -174,7 +174,7 @@ def check(interaction):
     foreground()
     time.sleep(1)
     img=pyautogui.screenshot()
-    img=img.crop((0,25,150,40))
+    img=img.crop((0,25,200,40))
     if interaction in read(img):
         return(True)
     else:
@@ -237,7 +237,7 @@ def jewel(option):
             select(4)
         else:
             print("I was looking for gold in my bank, but I could not find it. I do not know whow to continue from here")
-            os.system('taskkill /im JagexLauncher.exe')
+            math.sqrt(-1)
         
         #withdraw sapphire
         pyautogui.moveTo(tnormal(*[1029.5, 2.8, 1021, 1038]),tnormal(*[319.5, 3.5, 309, 330]),tnormal(0.5,0.5,0.1,1))
@@ -247,20 +247,22 @@ def jewel(option):
             select(4)
         else:
             print("I was looking for gold in my bank, but I could not find it. I do not know whow to continue from here")
-            os.system('taskkill /im JagexLauncher.exe')
+            math.sqrt(-1)
 
 def splash():
     prep_camera(4,"down")
+    time.sleep(1)
     while True:
         foreground()
+        #time.sleep(0.5)
         pyautogui.press("f6")
         #check if I can cast curse
         img=pyautogui.screenshot()
         ar=numpy.array(img)
         color=ar[778,1820].copy()
         if not numpy.array_equal(color,[169,6,237]):
-            print("Am I out of runes?")
-            os.system('taskkill /im JagexLauncher.exe')
+            print("Am I out of runes? "+str(color))
+            math.sqrt(-1)
         
         #select curse
         pyautogui.moveTo(tnormal(*[1824.0, 3.0, 1815, 1833]),tnormal(*[776.5, 2.8, 768, 785]),tnormal(0.5,0.5,0.1,1))
@@ -269,16 +271,14 @@ def splash():
             pyautogui.click()
         else:
             print("Curses, I didnt find my curse")
-            os.system('taskkill /im JagexLauncher.exe')
+            math.sqrt(-1)
         pyautogui.moveTo(tnormal(*[957.5, 3.8, 946, 969]),tnormal(*[478.0, 6.0, 460, 496]),tnormal(0.5,0.5,0.1,1))
         foreground()
         #check before attacking the monk
-        if check("Cast"):
+        if check("Monk"):
             pyautogui.click()
         else:
-            print("Curses, I didnt find my curse")
-            os.system('taskkill /im JagexLauncher.exe')
-            
+            pass            
             
 
 ##start script
